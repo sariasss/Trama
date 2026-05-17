@@ -37,7 +37,6 @@ fun PerfilScreen(
     movieViewModel: MovieViewModel = viewModel(),
     userViewModel: UserViewModel = viewModel()
 ) {
-    // Escucha cambios del ciclo de vida del usuario de forma reactiva
     val firebaseUser = authViewModel.state.user
 
     LaunchedEffect(userId, readOnly, firebaseUser) {
@@ -93,70 +92,30 @@ fun PerfilScreen(
 
             // HEADER
             item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                        .padding(top = 24.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text(
-                            text = if (readOnly) "ESPACIO DE" else "MI ESPACIO",
-                            color = Accent, fontSize = 12.sp, fontWeight = FontWeight.Black
-                        )
-                        Text(
-                            text = when {
-                                perfil == null -> ""
-                                perfil.username.isBlank() -> "@usuario"
-                                else -> "@${perfil.username}"
-                            },
-                            color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold
-                        )
-                    }
-
-                    if (!readOnly) {
-                        Button(
-                            onClick = {
-                                if (editando) {
-                                    username          = perfil?.username.orEmpty()
-                                    biography         = perfil?.biography.orEmpty()
-                                    avatarTemporalUrl = perfil?.profilePicture.orEmpty()
-                                }
-                                editando = !editando
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = Surface)
-                        ) {
-                            Text(if (editando) "Cancelar" else "Editar perfil", color = Color.White)
+                PerfilHeader(
+                    readOnly = readOnly,
+                    username = perfil?.username,
+                    editando = editando,
+                    followState = userViewModel.followState,
+                    onEditClick = {
+                        if (editando) {
+                            username = perfil?.username.orEmpty()
+                            biography = perfil?.biography.orEmpty()
+                            avatarTemporalUrl = perfil?.profilePicture.orEmpty()
                         }
-                    } else {
-                        // BOTÓN SEGUIR
-                        val followState = userViewModel.followState
-                        val (label, color) = when (followState) {
-                            UserViewModel.FollowState.FOLLOWING -> "Siguiendo" to Color(0xFF2C2A2C)
-                            UserViewModel.FollowState.PENDING   -> "Pendiente" to Color(0xFF2C2A2C)
-                            UserViewModel.FollowState.NONE      -> "Seguir"    to Accent
-                        }
-
-                        Button(
-                            onClick = {
-                                if (userId != null) {
-                                    when (followState) {
-                                        UserViewModel.FollowState.NONE      -> userViewModel.sendFollowRequest(userId)
-                                        UserViewModel.FollowState.FOLLOWING -> userViewModel.unfollowUser(userId)
-                                        UserViewModel.FollowState.PENDING   -> Unit
-                                    }
-                                }
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = color)
-                        ) {
-                            Text(label, color = Color.White)
+                        editando = !editando
+                    },
+                    onFollowClick = {
+                        userId?.let {
+                            when (userViewModel.followState) {
+                                UserViewModel.FollowState.NONE -> userViewModel.sendFollowRequest(it)
+                                UserViewModel.FollowState.FOLLOWING -> userViewModel.unfollowUser(it)
+                                UserViewModel.FollowState.PENDING -> Unit
+                            }
                         }
                     }
-                }
+                )
             }
-
             // AVATAR + CONTADORES (Convertidos en botones interactivos)
             item {
                 Row(
@@ -409,7 +368,6 @@ fun PerfilScreen(
                                             mostrarDialogoSeguidores = false
                                             mostrarDialogoSeguidos = false
 
-                                            // Carga asíncronamente el perfil del usuario pulsado
                                             userViewModel.loadExternalUserData(targetUid)
                                             userViewModel.checkFollowState(targetUid)
                                         }
