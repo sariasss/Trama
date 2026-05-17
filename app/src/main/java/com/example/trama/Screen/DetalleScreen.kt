@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.example.trama.Components.EscribirReseñaCard
 import com.example.trama.Data.Model.Movie
 import com.example.trama.ViewModel.MovieViewModel
 import com.example.trama.ViewModel.UserViewModel
@@ -233,13 +234,13 @@ fun DetalleScreen(
         if (showDialog) {
             EscribirReseñaCard(
                 movieTitle = movie.title,
-                onDismiss  = { showDialog = false },
+                onDismiss = { showDialog = false },
                 onEnviarClick = { rating, comment ->
                     userViewModel.publishReview(
-                        movieId    = movie.id,
+                        movieId = movie.id,
                         movieTitle = movie.title,
-                        rating     = rating,
-                        comment    = comment
+                        rating = rating,
+                        comment = comment
                     )
                     showDialog = false
                 }

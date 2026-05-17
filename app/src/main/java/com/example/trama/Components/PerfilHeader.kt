@@ -1,4 +1,4 @@
-package com.example.trama.Screen
+package com.example.trama.Components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

@@ -7,11 +7,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.trama.Components.NetworkMonitor
 import com.example.trama.Screen.AuthScreen
 import com.example.trama.Screen.NavigationWrapper
+import com.example.trama.Screen.SinConexionScreen
 import com.example.trama.ViewModel.AuthViewModel
 import com.example.trama.ViewModel.MovieViewModel
 import com.example.trama.ui.theme.TramaTheme
@@ -22,22 +28,30 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             TramaTheme {
-                val authViewModel: AuthViewModel = viewModel()
-                val movieViewModel: MovieViewModel = viewModel()
-                val authState = authViewModel.state
+                val context = LocalContext.current
+                val networkMonitor = remember { NetworkMonitor(context) }
+                val tieneInternet by networkMonitor.isConnected.collectAsState(initial = true)
 
-                if (authState.isSuccess) {
-                    LaunchedEffect(Unit) {
-                        movieViewModel.loadPopularMovies()
-                    }
-                    NavigationWrapper(
-                        authViewModel = authViewModel,
-                        movieViewModel = movieViewModel
-                    )
+                if (!tieneInternet) {
+                    SinConexionScreen()
                 } else {
-                    AuthScreen(
-                        viewModel = authViewModel
-                    )
+                    val authViewModel: AuthViewModel = viewModel()
+                    val movieViewModel: MovieViewModel = viewModel()
+                    val authState = authViewModel.state
+
+                    if (authState.isSuccess) {
+                        LaunchedEffect(Unit) {
+                            movieViewModel.loadPopularMovies()
+                        }
+                        NavigationWrapper(
+                            authViewModel = authViewModel,
+                            movieViewModel = movieViewModel
+                        )
+                    } else {
+                        AuthScreen(
+                            viewModel = authViewModel
+                        )
+                    }
                 }
             }
         }

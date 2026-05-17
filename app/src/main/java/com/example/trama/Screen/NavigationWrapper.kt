@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
+import com.example.trama.Components.BottomBar
 import com.example.trama.ViewModel.AuthViewModel
 import com.example.trama.ViewModel.MovieViewModel
 import com.example.trama.ViewModel.UserViewModel

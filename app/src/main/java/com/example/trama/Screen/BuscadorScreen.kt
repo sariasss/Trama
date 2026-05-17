@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.trama.Components.MovieCard
 import com.example.trama.Data.Model.Movie
 import com.example.trama.Data.Model.User
 import com.example.trama.ViewModel.MovieViewModel

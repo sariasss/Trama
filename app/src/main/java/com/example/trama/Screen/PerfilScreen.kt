@@ -21,6 +21,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.example.trama.Components.AvatarDialog
+import com.example.trama.Components.PerfilHeader
+import com.example.trama.Components.favoritosTab
+import com.example.trama.Components.reseñasTab
+import com.example.trama.Components.vistasTab
 import com.example.trama.ViewModel.AuthViewModel
 import com.example.trama.ViewModel.MovieViewModel
 import com.example.trama.ViewModel.UserViewModel
@@ -322,9 +327,9 @@ fun PerfilScreen(
     // elegior avatar
     if (mostrarDialogoFotos) {
         AvatarDialog(
-            avatarActual  = avatarTemporalUrl,
+            avatarActual = avatarTemporalUrl,
             onSeleccionar = { url -> avatarTemporalUrl = url; mostrarDialogoFotos = false },
-            onDismiss     = { mostrarDialogoFotos = false }
+            onDismiss = { mostrarDialogoFotos = false }
         )
     }
 

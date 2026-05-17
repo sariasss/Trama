@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,6 +15,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.trama.Components.MovieCard
+import com.example.trama.Components.ReviewFeedCard
 import com.example.trama.Data.Model.Movie
 import com.example.trama.ViewModel.MovieViewModel
 import com.example.trama.ViewModel.UserViewModel
@@ -111,7 +112,9 @@ fun InicioScreen(
                                 Text("Destacada", color = Color.White,
                                     fontSize = 18.sp, fontWeight = FontWeight.Bold)
                                 Spacer(Modifier.height(12.dp))
-                                MovieCard(movie = featured, onClick = { onNavigateToDetalle(featured) })
+                                MovieCard(
+                                    movie = featured,
+                                    onClick = { onNavigateToDetalle(featured) })
                             }
                         }
                     }
@@ -128,7 +131,9 @@ fun InicioScreen(
                                 horizontalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
                                 items(state.movies) { movie ->
-                                    MovieCard(movie = movie, onClick = { onNavigateToDetalle(movie) })
+                                    MovieCard(
+                                        movie = movie,
+                                        onClick = { onNavigateToDetalle(movie) })
                                 }
                             }
                         }
@@ -146,7 +151,9 @@ fun InicioScreen(
                                 horizontalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
                                 items(state.movies.takeLast(10)) { movie ->
-                                    MovieCard(movie = movie, onClick = { onNavigateToDetalle(movie) })
+                                    MovieCard(
+                                        movie = movie,
+                                        onClick = { onNavigateToDetalle(movie) })
                                 }
                             }
                         }

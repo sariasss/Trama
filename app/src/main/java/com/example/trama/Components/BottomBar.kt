@@ -1,4 +1,4 @@
-package com.example.trama.Screen
+package com.example.trama.Components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -17,11 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.trama.Screen.AppDestinations
 
 //footer
 @Composable
-fun BottomBar(navController: androidx.navigation.NavHostController) {
+fun BottomBar(navController: NavHostController) {
 
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
