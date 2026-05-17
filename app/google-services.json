@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "161560647231",
+    "firebase_url": "https://trama-14da0-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "trama-14da0",
+    "storage_bucket": "trama-14da0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:161560647231:android:ef0c3e5de70b6340320a8a",
+        "android_client_info": {
+          "package_name": "com.example.trama"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "161560647231-ri9iqsuathd6sedp7vbrhkrimr3fulqs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.trama",
+            "certificate_hash": "a36913ac61a9f911e067980ac2fbc3b09325db2a"
+          }
+        },
+        {
+          "client_id": "161560647231-pc8crbrl6ah9kc9u4nmu8cb4118glj6f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQVzaxj-RUY6lcUot_8Hiaqmizyhr-QxQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "161560647231-pc8crbrl6ah9kc9u4nmu8cb4118glj6f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
