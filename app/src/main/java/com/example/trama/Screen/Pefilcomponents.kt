@@ -25,9 +25,9 @@ import com.example.trama.Data.Model.Review
 private val Surface = Color(0xFF1C1A1C)
 private val Accent = Color(0xFF760B45)
 
-// =========================
-// FILA DE PELÍCULA
-// =========================
+//componentes varios de pelis
+
+//fila pelis
 @Composable
 fun MovieRow(movie: Movie) {
     Row(
@@ -82,13 +82,11 @@ fun MovieRow(movie: Movie) {
     }
 }
 
-// =========================
-// TARJETA DE RESEÑA (con edición y eliminación)
-//
+//tarjeta reseña, si es el usuario actual puede editar y eliminar
 @Composable
 fun ReviewCard(
     review: Review,
-    readOnly: Boolean = false, // Recibe si el perfil es ajeno o propio
+    readOnly: Boolean = false,
     onEdit: (newRating: Float, newComment: String) -> Unit = { _, _ -> },
     onDelete: () -> Unit = {}
 ) {
@@ -117,9 +115,6 @@ fun ReviewCard(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
-
-            // ──> CORRECCIÓN AQUÍ ──>
-            // Solo si NO es de lectura (es decir, si es MI perfil), muestro los botones
             if (!readOnly) {
                 Row {
                     IconButton(
@@ -140,7 +135,6 @@ fun ReviewCard(
 
         Spacer(Modifier.height(4.dp))
 
-        // Estrellas
         Row(verticalAlignment = Alignment.CenterVertically) {
             repeat(5) { index ->
                 Icon(
@@ -158,7 +152,6 @@ fun ReviewCard(
         Text(review.comment, color = Color(0xFFD1D1D6), fontSize = 14.sp)
     }
 
-    // DIÁLOGOS (Mantienen su lógica intacta ya que las variables de activación nunca cambiarán a true)
     if (mostrarDialogoEdicion) {
         EditReviewDialog(
             review = review,
@@ -200,9 +193,8 @@ fun ReviewCard(
         )
     }
 }
-// =========================
-// TARJETA PARA EL FEED DE INICIO (Actividad de Seguidos)
-// =========================
+
+//tarjeta reseñas ajenas
 @Composable
 fun ReviewFeedCard(
     review: Review,
@@ -214,7 +206,6 @@ fun ReviewFeedCard(
             .background(Surface, RoundedCornerShape(16.dp))
             .padding(16.dp)
     ) {
-        // Cabecera: Usuario y Puntuación
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -222,12 +213,11 @@ fun ReviewFeedCard(
         ) {
             Text(
                 text = "@${review.username.ifBlank { "usuario" }}",
-                color = Accent, // Color vino (0xFF760B45) para destacar el usuario
+                color = Accent,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp
             )
 
-            // Estrellas compactas
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.Star,
@@ -246,8 +236,6 @@ fun ReviewFeedCard(
         }
 
         Spacer(Modifier.height(6.dp))
-
-        // Título de la película criticada
         Text(
             text = review.movieTitle,
             color = Color.White,
@@ -257,22 +245,20 @@ fun ReviewFeedCard(
             overflow = TextOverflow.Ellipsis
         )
 
-        // Comentario de la reseña (si tiene)
         if (review.comment.isNotBlank()) {
             Spacer(Modifier.height(6.dp))
             Text(
                 text = review.comment,
                 color = Color(0xFF8A8A8F),
                 fontSize = 13.sp,
-                maxLines = 3, // Limitado a 3 líneas para mantener el feed limpio
+                maxLines = 3, //max 3 lineas
                 overflow = TextOverflow.Ellipsis
             )
         }
     }
 }
-// =========================
-// DIÁLOGO DE EDICIÓN DE RESEÑA
-// =========================
+
+//dialog editar reseña
 @Composable
 private fun EditReviewDialog(
     review: Review,
@@ -292,7 +278,6 @@ private fun EditReviewDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
-                // Selector de estrellas
                 Column {
                     Text("Puntuación", color = Color(0xFF8A8A8F), fontSize = 13.sp)
                     Spacer(Modifier.height(8.dp))
@@ -321,7 +306,6 @@ private fun EditReviewDialog(
                     }
                 }
 
-                // Campo comentario
                 OutlinedTextField(
                     value = comment,
                     onValueChange = { comment = it },
@@ -360,9 +344,7 @@ private fun EditReviewDialog(
     )
 }
 
-// =========================
-// ESTADO VACÍO
-// =========================
+//estado vacio
 @Composable
 fun EmptyState(mensaje: String, submensaje: String) {
     Column(

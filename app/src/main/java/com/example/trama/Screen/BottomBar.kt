@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 
+//footer
 @Composable
 fun BottomBar(navController: androidx.navigation.NavHostController) {
 

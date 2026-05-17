@@ -35,8 +35,6 @@ class MainActivity : ComponentActivity() {
                         movieViewModel = movieViewModel
                     )
                 } else {
-                    // Ahora AuthScreen no pide 'onGoogleSignIn' porque
-                    // el botón interno ejecuta directamente viewModel.iniciarGoogleSignIn(context)
                     AuthScreen(
                         viewModel = authViewModel
                     )

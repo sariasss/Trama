@@ -23,7 +23,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.launch
 
-// Cambiamos a AndroidViewModel para usar el contexto de forma segura
+
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     private val auth = FirebaseAuth.getInstance()
@@ -40,6 +40,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    //login
     fun login(email: String, password: String) {
         if (email.isBlank() || password.isBlank()) {
             state = state.copy(error = "Por favor, introduce tu correo y contraseña")
@@ -61,6 +62,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             }
     }
 
+    //registro
     fun register(email: String, password: String) {
         if (email.isBlank() || password.isBlank()) {
             state = state.copy(error = "Por favor, rellena todos los campos")
@@ -109,7 +111,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             }
     }
 
-    // NUEVA FUNCIÓN: Maneja todo el flujo de CredentialManager desde el ViewModel
+    // selector de cuenta de google
     fun iniciarGoogleSignIn(activityContext: android.content.Context) {
         viewModelScope.launch {
             state = state.copy(isLoading = true, error = null)
@@ -127,7 +129,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 .build()
 
             try {
-                // Nota: El método requiere el contexto de la Activity actual para renderizar el UI
                 val result = credentialManager.getCredential(context = activityContext, request = request)
                 val credential = result.credential
 
@@ -146,14 +147,12 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    //login con google
     fun loginWithGoogle(idToken: String) {
         auth.signInWithCredential(GoogleAuthProvider.getCredential(idToken, null))
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    // 1. ¡AQUÍ! El login fue un éxito, guardamos los datos en Realtime Database si es nuevo
                     registrarUsuarioEnDatabaseSiNoExiste()
-
-                    // 2. Después cambiamos el estado de la app para que navegue a la interfaz principal
                     state = state.copy(isLoading = false, user = auth.currentUser, isSuccess = true)
                 } else {
                     state = state.copy(isLoading = false, error = "No se pudo iniciar sesión con Firebase usando Google.")
@@ -161,21 +160,22 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             }
     }
 
+    //comprobamos que no exista ya el usuario de google y creeamos
+    //si quitamos no se guarda en la tabla users
     fun registrarUsuarioEnDatabaseSiNoExiste() {
         val currentUser = FirebaseAuth.getInstance().currentUser ?: return
         val uid = currentUser.uid
         val databaseRef = FirebaseDatabase.getInstance().getReference("Usuarios").child(uid)
 
-        // Comprobamos si el nodo del usuario ya existe en Realtime Database
         databaseRef.get().addOnSuccessListener { snapshot ->
             if (!snapshot.exists()) {
-                // Si NO existe, es su primera vez iniciando sesión con Google. lo creamos:
+                // se crea el usuario
                 val nuevoUsuario = mapOf(
                     "uid" to uid,
                     "username" to (currentUser.displayName ?: "User_${uid.take(4)}"),
                     "email" to currentUser.email.orEmpty(),
                     "biography" to "",
-                    "profilePicture" to currentUser.photoUrl.toString() // Aprovechamos su foto de Google
+                    "profilePicture" to currentUser.photoUrl.toString()
                 )
 
                 databaseRef.setValue(nuevoUsuario).addOnSuccessListener {
@@ -186,6 +186,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
+
+    //logout
     fun logout() {
         auth.signOut()
         state = AuthState()

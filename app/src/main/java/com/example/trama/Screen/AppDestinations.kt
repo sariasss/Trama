@@ -5,12 +5,9 @@ sealed class AppDestinations(val route: String) {
     object Inicio : AppDestinations("inicio")
     object Buscador : AppDestinations("buscador")
     object Perfil : AppDestinations("perfil")
-
-    // CORRECCIÓN: Cambiar "perfil/" por "usuario/" para evitar colisiones
     object PerfilUsuario : AppDestinations("usuario/{userId}") {
         fun createRoute(userId: String) = "usuario/$userId"
     }
-
     object Detalle : AppDestinations("detalle/{title}") {
         fun createRoute(title: String) = "detalle/${Uri.encode(title)}"
     }

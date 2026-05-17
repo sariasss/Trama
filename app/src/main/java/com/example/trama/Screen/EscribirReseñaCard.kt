@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 
+//dialog para escribir reseñas
 @Composable
 fun EscribirReseñaCard(
     movieTitle: String,
@@ -52,7 +53,6 @@ fun EscribirReseñaCard(
                 .padding(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // TÍTULO DEL DIÁLOGO
             Text(
                 text = "TU CRÍTICA",
                 color = Color(0xFF760B45),
@@ -73,7 +73,6 @@ fun EscribirReseñaCard(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // SELECTOR DE ESTRELLAS DE 1 A 5
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -92,7 +91,6 @@ fun EscribirReseñaCard(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // CAMPO DE TEXTO ABIERTO (TextField normal personalizado)
             TextField(
                 value = comment,
                 onValueChange = { comment = it },
@@ -114,7 +112,6 @@ fun EscribirReseñaCard(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // BOTONES DE ACCIÓN
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End,
@@ -126,10 +123,9 @@ fun EscribirReseñaCard(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                // BOTÓN DE ACCIÓN MODIFICADO
                 Button(
                     onClick = {
-                        if (rating > 0f) { // Ahora solo exige que la puntuación sea mayor que 0
+                        if (rating > 0f) {
                             onEnviarClick(rating, comment)
                         }
                     },
@@ -138,7 +134,7 @@ fun EscribirReseñaCard(
                         disabledContainerColor = Color(0xFF4E474E)
                     ),
                     shape = RoundedCornerShape(20.dp),
-                    enabled = rating > 0f // Habilitado solo con poner estrellas
+                    enabled = rating > 0f
                 ) {
                     Text("Publicar", fontWeight = FontWeight.Bold, color = Color.White)
                 }

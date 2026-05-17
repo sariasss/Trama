@@ -5,9 +5,10 @@ import androidx.compose.foundation.lazy.items
 import com.example.trama.Data.Model.Movie
 import com.example.trama.Data.Model.Review
 
+//lista de reviews
 fun LazyListScope.reseñasTab(
     reviews: List<Review>,
-    readOnly: Boolean = false, // <-- Este parámetro nos dice si el perfil es ajeno
+    readOnly: Boolean = false,
     onEdit: (reviewId: String, newRating: Float, newComment: String) -> Unit = { _, _, _ -> },
     onDelete: (reviewId: String) -> Unit = {}
 ) {
@@ -22,7 +23,7 @@ fun LazyListScope.reseñasTab(
         items(reviews, key = { it.id }) { review ->
             ReviewCard(
                 review = review,
-                readOnly = readOnly, // 👈 ¡ESTA LINEA ES CLAVE! Pásale el readOnly a la tarjeta
+                readOnly = readOnly,
                 onEdit = { newRating, newComment ->
                     onEdit(review.id, newRating, newComment)
                 },
@@ -34,6 +35,7 @@ fun LazyListScope.reseñasTab(
     }
 }
 
+// lista favs
 fun LazyListScope.favoritosTab(movies: List<Movie>, readOnly: Boolean = false) {
     if (movies.isEmpty()) {
         item {
@@ -49,26 +51,13 @@ fun LazyListScope.favoritosTab(movies: List<Movie>, readOnly: Boolean = false) {
     }
 }
 
+//lista vistas
 fun LazyListScope.vistasTab(movies: List<Movie>, readOnly: Boolean = false) {
     if (movies.isEmpty()) {
         item {
             EmptyState(
                 mensaje = if (readOnly) "Este usuario no ha visto películas" else "Todavía no has marcado películas",
                 submensaje = if (readOnly) "" else "Pulsa el ojo en el detalle de una película"
-            )
-        }
-    } else {
-        items(movies, key = { it.id }) { movie ->
-            MovieRow(movie = movie)
-        }
-    }
-}
-fun LazyListScope.vistasTab(movies: List<Movie>) {
-    if (movies.isEmpty()) {
-        item {
-            EmptyState(
-                mensaje = "Todavía no has marcado películas",
-                submensaje = "Pulsa el ojo en el detalle de una película"
             )
         }
     } else {

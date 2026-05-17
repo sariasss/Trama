@@ -10,7 +10,7 @@ data class Movie(
     @SerializedName("backdrop_path") val backdropPath: String?,
     @SerializedName("release_date") val releaseDate: String?,
     @SerializedName("vote_average") val voteAverage: Double,
-    val runtime: Int? = null,
+    val runtime: Int? = null, //duracion pelicula
     val genresText: String? = null
 )
 

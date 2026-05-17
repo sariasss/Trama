@@ -19,13 +19,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 
+// dialog cambiar avatar con opciones
 @Composable
 fun AvatarDialog(
     avatarActual: String,
     onSeleccionar: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
-    // Lista de imágenes sugeridas para avatares (puedes cambiarlas por las que quieras)
+    // avatares disponibles
     val avatares = listOf(
         "https://nupec.com/wp-content/uploads/2021/12/domestic-cat-EABDSUL-1024x779.jpg",
         "https://www.anipedia.net/imagenes/que-comen-los-perros.jpg",
@@ -34,7 +35,6 @@ fun AvatarDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        // Usamos el color de superficie de tu app (Color(0xFF1C1A1C))
         containerColor   = Color(0xFF1C1A1C),
         shape            = RoundedCornerShape(20.dp),
         title = {
@@ -47,7 +47,6 @@ fun AvatarDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                // Usamos tu color Accent (Color(0xFF760B45))
                 Text("Cancelar", color = Color(0xFF760B45), fontWeight = FontWeight.Bold)
             }
         },
@@ -86,16 +85,14 @@ fun AvatarDialog(
                                 contentScale = ContentScale.Crop
                             )
 
-                            // Si es el avatar actualmente seleccionado, añadimos un indicador visual sutil
                             if (avatarActual == url) {
                                 Box(
                                     modifier = Modifier
                                         .size(72.dp)
                                         .clip(CircleShape)
-                                        .background(Color(0x66760B45)), // Tinte del color Accent
+                                        .background(Color(0x66760B45)),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    // Un círculo interior para denotar que está activo
                                     Box(
                                         modifier = Modifier
                                             .size(12.dp)

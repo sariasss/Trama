@@ -20,52 +20,44 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.launch
 
-class UserViewModel : ViewModel() {
 
+//perfi usuario actual:
+//favoritos y pelis vistas, reseñas nuestras y de otros, seguimiento y seguidos
+class UserViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
     private val db   = FirebaseDatabase.getInstance()
     private val api  = ApiService.getInstance()
-
     private val usuariosRef  get() = db.getReference("Usuarios")
     private val reviewsRef   get() = db.getReference("Reseñas")
-
-    // Convertimos estas referencias en variables dinámicas que actualizaremos al iniciar sesión
     private var watchedRef:     DatabaseReference? = null
     private var favoritesRef:   DatabaseReference? = null
     private var userRef:        DatabaseReference? = null
 
     var state by mutableStateOf(UserState())
         private set
-
     var currentUserProfile   by mutableStateOf<User?>(null)       ; private set
     var userReviews          by mutableStateOf<List<Review>>(emptyList()) ; private set
     var watchedMoviesIds     by mutableStateOf<List<Int>>(emptyList())    ; private set
     var watchedMoviesDetails by mutableStateOf<List<Movie>>(emptyList())  ; private set
     var favoritesIds         by mutableStateOf<List<Int>>(emptyList())    ; private set
     var favoritesDetails     by mutableStateOf<List<Movie>>(emptyList())  ; private set
-
     var viewedUserProfile    by mutableStateOf<User?>(null)        ; private set
     var viewedUserReviews    by mutableStateOf<List<Review>>(emptyList()) ; private set
     var viewedUserFavorites  by mutableStateOf<List<Movie>>(emptyList())  ; private set
     var viewedUserWatched    by mutableStateOf<List<Movie>>(emptyList())  ; private set
-
     var followState by mutableStateOf(FollowState.NONE) ; private set
     enum class FollowState { NONE, PENDING, FOLLOWING }
-
     private var userListener:        ValueEventListener? = null
     private var watchedListener:     ValueEventListener? = null
     private var favoritesListener:   ValueEventListener? = null
     private var userReviewsListener: ValueEventListener? = null
 
-    // CORRECCIÓN: Quitamos el init { initUserSession() } de aquí porque ahora
-    // depende exclusivamente del UID que provee el AuthViewModel desde la UI.
 
-    // Inicializa listeners garantizando el uso del UID verificado de la sesión
+    //inicializa la sesion del usuario
     fun initUserSession(authenticatedUid: String?) {
         removeListeners()
 
         if (!authenticatedUid.isNullOrBlank()) {
-            // Reconstruimos las referencias de forma segura con el UID real
             userRef      = usuariosRef.child(authenticatedUid)
             watchedRef   = db.getReference("Vistas").child(authenticatedUid)
             favoritesRef = db.getReference("Favoritos").child(authenticatedUid)
@@ -80,6 +72,7 @@ class UserViewModel : ViewModel() {
         }
     }
 
+    //escucha los cambios en el perfil
     private fun observeUser() {
         userListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -90,6 +83,7 @@ class UserViewModel : ViewModel() {
         userRef?.addValueEventListener(userListener!!)
     }
 
+    //edita usuario
     fun saveUserProfile(username: String, biography: String, profilePicture: String) {
         val uid = auth.currentUser?.uid ?: return
         usuariosRef.child(uid).updateChildren(
@@ -101,6 +95,7 @@ class UserViewModel : ViewModel() {
         )
     }
 
+    //escucha las pelis vistas y las carga de la api
     private fun observeWatchedMovies() {
         watchedListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -120,6 +115,7 @@ class UserViewModel : ViewModel() {
         }
     }
 
+    //añade o eliminar peli vista
     fun toggleWatchedMovie(movieId: Int) {
         val uid = auth.currentUser?.uid ?: return
         val ref = db.getReference("Vistas").child(uid).child(movieId.toString())
@@ -130,6 +126,7 @@ class UserViewModel : ViewModel() {
         }
     }
 
+    //escucha las pelis favs y las carga de la api
     private fun observeFavorites() {
         favoritesListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -149,6 +146,7 @@ class UserViewModel : ViewModel() {
         }
     }
 
+    //añade o quita peli fav
     fun toggleFavorite(movieId: Int) {
         val uid = auth.currentUser?.uid ?: return
         val ref = db.getReference("Favoritos").child(uid).child(movieId.toString())
@@ -159,6 +157,7 @@ class UserViewModel : ViewModel() {
         }
     }
 
+    //escucha en tiempo real las reseñas del usuario actual
     private fun observeUserReviews(uid: String) {
         userReviewsListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -172,6 +171,7 @@ class UserViewModel : ViewModel() {
             .addValueEventListener(userReviewsListener!!)
     }
 
+    //publica una review
     fun publishReview(movieId: Int, movieTitle: String, rating: Float, comment: String) {
         val uid = auth.currentUser?.uid ?: return
         usuariosRef.child(uid).get().addOnSuccessListener { snapshot ->
@@ -195,6 +195,7 @@ class UserViewModel : ViewModel() {
         }
     }
 
+    //edita reseña
     fun editReview(reviewId: String, newRating: Float, newComment: String) {
         reviewsRef.child(reviewId).updateChildren(
             mapOf("rating" to newRating, "comment" to newComment.trim(), "timestamp" to System.currentTimeMillis())
@@ -203,6 +204,7 @@ class UserViewModel : ViewModel() {
 
     fun deleteReview(reviewId: String) { reviewsRef.child(reviewId).removeValue() }
 
+    //carga perfil, reseñas, vistas y favs de otro usuario
     fun loadExternalUserData(userId: String) {
         viewedUserProfile   = null
         viewedUserReviews   = emptyList()
@@ -241,6 +243,7 @@ class UserViewModel : ViewModel() {
         }
     }
 
+    //comprueba solicitudes y si seguimos a alguien o no
     fun checkFollowState(targetUid: String) {
         val myUid = auth.currentUser?.uid ?: return
         if (targetUid == myUid) {
@@ -256,6 +259,7 @@ class UserViewModel : ViewModel() {
         }
     }
 
+    //manda solicitud y crea notificacion
     fun sendFollowRequest(targetUid: String) {
         val myUid = auth.currentUser?.uid ?: return
         if (targetUid == myUid) return
@@ -285,6 +289,7 @@ class UserViewModel : ViewModel() {
         }
     }
 
+    //acepta solicidud de seguimiento y actualiza seguidores/seguidos
     fun acceptFollowRequest(requesterUid: String) {
         val myUid = auth.currentUser?.uid ?: return
 
@@ -303,6 +308,7 @@ class UserViewModel : ViewModel() {
         }
     }
 
+    //eliminar solicitud y notificacion
     fun rejectFollowRequest(requesterUid: String) {
         val myUid = auth.currentUser?.uid ?: return
         usuariosRef.child(myUid).child("pendingRequests").child(requesterUid).removeValue()
@@ -318,6 +324,7 @@ class UserViewModel : ViewModel() {
         }
     }
 
+    //deja de seguir
     fun unfollowUser(targetUid: String) {
         val myUid = auth.currentUser?.uid ?: return
         usuariosRef.child(targetUid).child("followers").child(myUid).removeValue()
@@ -325,6 +332,7 @@ class UserViewModel : ViewModel() {
             .addOnSuccessListener { followState = FollowState.NONE }
     }
 
+    //busca user por username
     fun searchUsers(query: String) {
         if (query.isBlank()) {
             state = state.copy(userSearchResults = emptyList()); return
@@ -345,6 +353,7 @@ class UserViewModel : ViewModel() {
         }
     }
 
+    //carga reseñas de usuarios que seguimos
     fun loadFollowingFeed() {
         val myUid = auth.currentUser?.uid ?: return
         state = state.copy(isLoadingFeed = true)
@@ -375,6 +384,7 @@ class UserViewModel : ViewModel() {
             }
     }
 
+    //lista uid con solicitudes pendientes
     val pendingRequestUids: List<String>
         get() = currentUserProfile?.pendingRequests?.keys?.toList() ?: emptyList()
 

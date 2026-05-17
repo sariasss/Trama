@@ -29,6 +29,8 @@ private val BgDark  = Color(0xFF121012)
 private val Surface = Color(0xFF1C1A1C)
 private val Accent  = Color(0xFF760B45)
 
+//pantalla usuario, puede ver sus reseñas, favoritos y vistas, ve las notificaciones de seguimiento
+// podemos ver quien nos sigue y a quien seguimos
 @Composable
 fun PerfilScreen(
     userId: String? = null,
@@ -42,14 +44,13 @@ fun PerfilScreen(
     LaunchedEffect(userId, readOnly, firebaseUser) {
         Log.d("DEBUG_TRAMA", "userId recibido: '$userId' | readOnly: $readOnly")
 
+        //comprobar si es mi perfil o no
         if (readOnly) {
-            // Caso A: Perfil de otro usuario
             if (userId != null) {
                 userViewModel.loadExternalUserData(userId)
                 userViewModel.checkFollowState(userId)
             }
         } else {
-            // Caso B: Mi propio perfil
             if (firebaseUser != null) {
                 userViewModel.initUserSession(authenticatedUid = firebaseUser.uid)
             }
@@ -58,25 +59,24 @@ fun PerfilScreen(
 
     val perfil = if (readOnly) userViewModel.viewedUserProfile else userViewModel.currentUserProfile
 
-    var editando          by remember { mutableStateOf(false) }
-    var username          by remember(perfil) { mutableStateOf(perfil?.username.orEmpty()) }
-    var biography         by remember(perfil) { mutableStateOf(perfil?.biography.orEmpty()) }
+    var editando by remember { mutableStateOf(false) }
+    var username by remember(perfil) { mutableStateOf(perfil?.username.orEmpty()) }
+    var biography by remember(perfil) { mutableStateOf(perfil?.biography.orEmpty()) }
     var avatarTemporalUrl by remember(perfil) { mutableStateOf(perfil?.profilePicture.orEmpty()) }
     var mostrarDialogoFotos by remember { mutableStateOf(false) }
-    var pestañaActiva     by remember { mutableStateOf("RESEÑAS") }
+    var pestañaActiva by remember { mutableStateOf("RESEÑAS") }
 
-    // Estados para controlar los diálogos de seguidores y seguidos
     var mostrarDialogoSeguidores by remember { mutableStateOf(false) }
-    var mostrarDialogoSeguidos   by remember { mutableStateOf(false) }
+    var mostrarDialogoSeguidos by remember { mutableStateOf(false) }
 
     val listaUidsMostrar = remember(mostrarDialogoSeguidores, mostrarDialogoSeguidos, perfil) {
         if (mostrarDialogoSeguidores) perfil?.followers?.keys?.toList().orEmpty()
         else perfil?.following?.keys?.toList().orEmpty()
     }
 
-    val reviews   = if (readOnly) userViewModel.viewedUserReviews   else userViewModel.userReviews
-    val favorites = if (readOnly) userViewModel.viewedUserFavorites  else userViewModel.favoritesDetails
-    val watched   = if (readOnly) userViewModel.viewedUserWatched    else userViewModel.watchedMoviesDetails
+    val reviews = if (readOnly) userViewModel.viewedUserReviews else userViewModel.userReviews
+    val favorites = if (readOnly) userViewModel.viewedUserFavorites else userViewModel.favoritesDetails
+    val watched = if (readOnly) userViewModel.viewedUserWatched else userViewModel.watchedMoviesDetails
 
     Box(
         modifier = Modifier
@@ -90,7 +90,7 @@ fun PerfilScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            // HEADER
+            // header
             item {
                 PerfilHeader(
                     readOnly = readOnly,
@@ -116,7 +116,7 @@ fun PerfilScreen(
                     }
                 )
             }
-            // AVATAR + CONTADORES (Convertidos en botones interactivos)
+            // avatar y seguidores/seguidos
             item {
                 Row(
                     modifier = Modifier.padding(horizontal = 24.dp),
@@ -152,7 +152,7 @@ fun PerfilScreen(
                         }
                     }
 
-                    // BOTÓN SEGUIDORES
+                    // btn seguidores
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
@@ -167,7 +167,7 @@ fun PerfilScreen(
                         Text("seguidores", color = Color(0xFF8A8A8F), fontSize = 11.sp)
                     }
 
-                    // BOTÓN SEGUIDOS
+                    // btn seguidos
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
@@ -184,7 +184,7 @@ fun PerfilScreen(
                 }
             }
 
-            // SOLICITUDES PENDIENTES
+            // solicitudes
             item {
                 if (!readOnly) {
                     val pendientes = userViewModel.pendingRequestUids
@@ -229,7 +229,7 @@ fun PerfilScreen(
                 }
             }
 
-            // BIO / EDICIÓN
+            // bio y edicion
             item {
                 if (!editando) {
                     Column(
@@ -261,7 +261,7 @@ fun PerfilScreen(
                 }
             }
 
-            // CERRAR SESIÓN
+            // logout
             item {
                 if (!editando && !readOnly) {
                     Text(
@@ -277,7 +277,7 @@ fun PerfilScreen(
                 }
             }
 
-            // TABS
+            // reseñas, fav y vista
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
@@ -301,12 +301,11 @@ fun PerfilScreen(
                 }
             }
 
-            // DIVISOR
             item {
                 Box(Modifier.fillMaxWidth().padding(horizontal = 24.dp).height(1.dp).background(Surface))
             }
 
-            // CONTENIDO TABS
+            // pestaña activa reseñas, favoritos y vista
             when (pestañaActiva) {
                 "RESEÑAS" -> reseñasTab(
                     reviews  = reviews,
@@ -320,7 +319,7 @@ fun PerfilScreen(
         }
     }
 
-    // DIÁLOGO DE SELECCIÓN DE AVATAR
+    // elegior avatar
     if (mostrarDialogoFotos) {
         AvatarDialog(
             avatarActual  = avatarTemporalUrl,
@@ -329,7 +328,7 @@ fun PerfilScreen(
         )
     }
 
-    // DIÁLOGO FLOTANTE PARA SEGUIDORES Y SIGUIENDO
+    // dialog ver seguidores y seguidos
     if (mostrarDialogoSeguidores || mostrarDialogoSeguidos) {
         AlertDialog(
             onDismissRequest = {

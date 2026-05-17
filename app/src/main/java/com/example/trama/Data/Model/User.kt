@@ -6,7 +6,6 @@ data class User(
     val email: String = "",
     val biography: String = "",
     val profilePicture: String = "",
-    // Map<uid, true> en lugar de List — Firebase serializa esto de forma fiable
     val followers: Map<String, Boolean> = emptyMap(),
     val following: Map<String, Boolean> = emptyMap(),
     val pendingRequests: Map<String, Boolean> = emptyMap()

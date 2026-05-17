@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.trama.ViewModel.UserViewModel
 
+//header pagina pergil
 @Composable
 fun PerfilHeader(
     readOnly: Boolean,

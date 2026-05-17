@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.trama.Data.Model.Movie
 
+//card de pelicula
 @Composable
 fun MovieCard(
     movie: Movie,
@@ -34,7 +35,7 @@ fun MovieCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp)
-                .clip(RoundedCornerShape(24.dp)) // Curvas de tu marca
+                .clip(RoundedCornerShape(24.dp))
         ) {
             val fullImageUrl = "https://image.tmdb.org/t/p/w500${movie.posterPath}"
 
@@ -45,7 +46,6 @@ fun MovieCard(
                 contentScale = ContentScale.Crop
             )
 
-            // Nota de la API flotando
             Box(
                 modifier = Modifier
                     .padding(8.dp)

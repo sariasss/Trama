@@ -26,6 +26,8 @@ import com.example.trama.Data.Model.Movie
 import com.example.trama.Data.Model.User
 import com.example.trama.ViewModel.MovieViewModel
 import com.example.trama.ViewModel.UserViewModel
+
+//buscador peliculas por nombre, genero y buscador @usuario
 @Composable
 fun BuscadorScreen(
     movieViewModel: MovieViewModel,
@@ -47,7 +49,6 @@ fun BuscadorScreen(
             .background(Color(0xFF121012))
             .padding(top = 36.dp)
     ) {
-        // HEADER
         Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 12.dp)) {
             Text("EXPLORAR", color = Color(0xFF760B45), fontSize = 12.sp,
                 fontWeight = FontWeight.Black, letterSpacing = 2.sp)
@@ -64,7 +65,6 @@ fun BuscadorScreen(
                 onValueChange = { nuevo ->
                     query = nuevo
                     if (nuevo.startsWith("@")) {
-                        // Enviamos la query limpia sin el símbolo '@'
                         userViewModel.searchUsers(nuevo.removePrefix("@"))
                     } else {
                         movieViewModel.searchMovies(nuevo)
@@ -126,7 +126,6 @@ fun BuscadorScreen(
                 ResultadosPeliculas(
                     isLoading  = movieState.isLoading,
                     error      = movieState.error,
-                    // CORRECCIÓN: Usamos la lista de resultados de búsqueda independiente
                     movies     = movieState.searchResults,
                     query      = query,
                     onNavigateToDetalle = onNavigateToDetalle

@@ -17,10 +17,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.trama.Data.Model.Movie
-import com.example.trama.Data.Model.Review
 import com.example.trama.ViewModel.MovieViewModel
 import com.example.trama.ViewModel.UserViewModel
 
+//pagina principal, lista peliculas destacadas, tendencias, recomendadas y vemos reseñas de seguidos
 @Composable
 fun InicioScreen(
     movieViewModel: MovieViewModel,
@@ -64,7 +64,6 @@ fun InicioScreen(
                     verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
 
-                    // HEADER
                     item {
                         Column(modifier = Modifier.padding(horizontal = 24.dp)) {
                             Text("TRAMA", color = Color(0xFF760B45), fontSize = 12.sp,
@@ -78,7 +77,7 @@ fun InicioScreen(
                         }
                     }
 
-                    // FEED DE SEGUIDOS — Muestra de forma limpia críticas de tus amigos
+                    // ver reseñas de seguidos
                     item {
                         Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)) {
                             Text("Actividad de seguidos", color = Color.White,
@@ -104,7 +103,7 @@ fun InicioScreen(
                         }
                     }
 
-                    // DESTACADA (Usa la lista inmutable del home)
+                    // pelis destacadas
                     item {
                         val featured = state.movies.firstOrNull()
                         if (featured != null) {
@@ -117,7 +116,7 @@ fun InicioScreen(
                         }
                     }
 
-                    // TENDENCIAS (Ya no se ve afectado por el buscador)
+                    // pelis tendencias
                     item {
                         Column {
                             Text("🔥 Tendencias", color = Color.White,
@@ -135,7 +134,7 @@ fun InicioScreen(
                         }
                     }
 
-                    // RECOMENDADAS
+                    // recomedadas
                     item {
                         Column {
                             Text("🎯 Recomendadas", color = Color.White,
@@ -146,7 +145,6 @@ fun InicioScreen(
                                 contentPadding = PaddingValues(horizontal = 24.dp),
                                 horizontalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
-                                // Evitamos usar .shuffled() directo en la composición para prevenir recomposiciones infinitas y parpadeos
                                 items(state.movies.takeLast(10)) { movie ->
                                     MovieCard(movie = movie, onClick = { onNavigateToDetalle(movie) })
                                 }

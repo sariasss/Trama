@@ -23,7 +23,6 @@ interface ApiService {
         @Query("api_key") apiKey: String = "653fa9eca845f6c757d4f9487a3427a2"
     ): Movie
 
-    // ⭐ NUEVO: POPULARES
     @GET("movie/popular")
     suspend fun getPopularMovies(
         @Query("language") language: String = "es-ES",

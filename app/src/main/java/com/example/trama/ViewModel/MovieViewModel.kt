@@ -21,27 +21,23 @@ class MovieViewModel : ViewModel() {
     private val db = FirebaseDatabase.getInstance()
     private val api = ApiService.getInstance()
     private val reviewsRef get() = db.getReference("Reseñas")
-
     var state by mutableStateOf(MovieState())
         private set
-
     var selectedMovie by mutableStateOf<Movie?>(null)
         private set
-
     var movieReviews by mutableStateOf<List<Review>>(emptyList())
         private set
-
     private var movieReviewsListener: ValueEventListener? = null
 
-    // ── Selección y reseñas de película ────────────────────────────────
-
+    //guarda la peli seleccionada
     fun selectMovie(movie: Movie) {
         selectedMovie = movie
         observeMovieReviews(movie.id)
     }
 
+    //escucha en tiempo real las reseñas de una peli
     private fun observeMovieReviews(movieId: Int) {
-        movieReviewsListener?.let { reviewsRef.removeEventListener(it) }
+        movieReviewsListener?.let { reviewsRef.removeEventListener(it) } //elimina listener anterior
 
         movieReviewsListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -56,22 +52,18 @@ class MovieViewModel : ViewModel() {
             .addValueEventListener(movieReviewsListener!!)
     }
 
-    // ── Búsqueda y populares ────────────────────────────────────────────
-
+    //buscar peli
     fun searchMovies(query: String) {
         if (query.isBlank()) {
             state = state.copy(searchResults = emptyList())
             return
         }
         state = state.copy(isLoading = true)
-
         viewModelScope.launch {
             try {
                 val response = api.searchMovies(query)
-
-                // CORRECCIÓN: Extraemos la lista 'results' que viene dentro del response
                 state = state.copy(
-                    searchResults = response.results, // <--- Añade el .results aquí
+                    searchResults = response.results,
                     isLoading = false
                 )
             } catch (e: Exception) {
@@ -80,6 +72,7 @@ class MovieViewModel : ViewModel() {
         }
     }
 
+    //ver pelis populares para la pantalla principalñ
     fun loadPopularMovies() {
         viewModelScope.launch {
             state = state.copy(isLoading = true, error = null)
@@ -92,6 +85,7 @@ class MovieViewModel : ViewModel() {
         }
     }
 
+    //limpia cuando el viewmodel se desturye
     override fun onCleared() {
         super.onCleared()
         movieReviewsListener?.let { reviewsRef.removeEventListener(it) }

@@ -16,13 +16,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.trama.ViewModel.AuthViewModel
 
+//login, registro y logout, inicio google
 @Composable
 fun AuthScreen(
     viewModel: AuthViewModel,
     onAuthSuccess: () -> Unit = {}
 ) {
     val state = viewModel.state
-    val context = LocalContext.current // Obtenemos el contexto de la Activity para el panel visual
+    val context = LocalContext.current
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -63,7 +64,6 @@ fun AuthScreen(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // TABS
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -98,7 +98,6 @@ fun AuthScreen(
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            // CAMPOS
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
@@ -142,7 +141,6 @@ fun AuthScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // BOTÓN PRINCIPAL
             Button(
                 onClick = {
                     if (isLoginTab) viewModel.login(email, password)
@@ -168,7 +166,6 @@ fun AuthScreen(
                 }
             }
 
-            // SEPARADOR
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -179,7 +176,7 @@ fun AuthScreen(
                 HorizontalDivider(modifier = Modifier.weight(1f), color = Color(0xFF2C2A2C))
             }
 
-            // BOTÓN GOOGLE LIMPIO
+            // google
             OutlinedButton(
                 onClick = { viewModel.iniciarGoogleSignIn(context) },
                 modifier = Modifier
@@ -211,7 +208,6 @@ fun AuthScreen(
                 }
             }
 
-            // ERROR
             if (state.error != null) {
                 Text(
                     text = state.error ?: "",

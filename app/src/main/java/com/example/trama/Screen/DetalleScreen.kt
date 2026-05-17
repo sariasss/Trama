@@ -24,6 +24,7 @@ import com.example.trama.Data.Model.Movie
 import com.example.trama.ViewModel.MovieViewModel
 import com.example.trama.ViewModel.UserViewModel
 
+//ver detalle de la peli, hacer reseña, ver reseñas, boton peli vista y boton fav
 @Composable
 fun DetalleScreen(
     movie: Movie,
@@ -52,7 +53,6 @@ fun DetalleScreen(
             contentPadding = PaddingValues(bottom = 32.dp)
         ) {
 
-            // BACKDROP
             item {
                 Box(
                     modifier = Modifier
@@ -78,7 +78,6 @@ fun DetalleScreen(
                 }
             }
 
-            // INFO
             item {
                 Row(
                     modifier = Modifier
@@ -105,17 +104,19 @@ fun DetalleScreen(
                         Row {
                             Icon(Icons.Default.Star, null, tint = Color(0xFFFFC107))
                             Spacer(Modifier.width(4.dp))
+
                             Text("${movie.voteAverage}/10", color = Color.White)
                             Spacer(Modifier.width(12.dp))
+
                             Icon(Icons.Default.DateRange, null, tint = Color.Gray)
                             Spacer(Modifier.width(4.dp))
+
                             Text(movie.releaseDate?.take(4) ?: "N/A", color = Color.White)
                         }
                     }
                 }
             }
 
-            // SINOPSIS
             item {
                 Column(
                     modifier = Modifier
@@ -129,7 +130,6 @@ fun DetalleScreen(
                 }
             }
 
-            // BOTÓN RESEÑA
             item {
                 Button(
                     onClick = { showDialog = true },
@@ -140,11 +140,10 @@ fun DetalleScreen(
                     colors = ButtonDefaults.buttonColors(Color(0xFF760B45)),
                     shape = RoundedCornerShape(24.dp)
                 ) {
-                    Text("ESCRIBIR UNA CRÍTICA", fontWeight = FontWeight.Bold)
+                    Text("ESCRIBIR UNA RESEÑA", fontWeight = FontWeight.Bold)
                 }
             }
 
-            // RESEÑAS
             item {
                 Text("RESEÑAS", color = Color.White, fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
@@ -159,14 +158,11 @@ fun DetalleScreen(
                     colors = CardDefaults.cardColors(containerColor = Color(0xFF1C1A1C)),
                     shape = RoundedCornerShape(16.dp),
                     onClick = {
-                        // 1. Obtenemos tu ID actual de Firebase
                         val miUid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
 
-                        // 2. Comparamos
+                        //si es un comentario mio, no puedo entrar al perfil
                         if (review.userId == miUid) {
-                            // Es tu propia reseña: NO HACE NADA (Evita que vayas a tu perfil como ajeno)
                         } else {
-                            // Es la reseña de otra persona: Navega normalmente
                             onNavigateToUserProfile(review.userId)
                         }
                     }
@@ -200,7 +196,6 @@ fun DetalleScreen(
             }
         }
 
-        // BOTÓN VOLVER
         IconButton(
             onClick = onBack,
             modifier = Modifier
@@ -210,7 +205,7 @@ fun DetalleScreen(
             Icon(Icons.Default.ArrowBack, null, tint = Color.White)
         }
 
-        // 👁 VISTA
+        // boton peli vista
         IconButton(
             onClick = { userViewModel.toggleWatchedMovie(movie.id) },
             modifier = Modifier
@@ -222,7 +217,7 @@ fun DetalleScreen(
                 tint = if (yaVista) Color(0xFF760B45) else Color.White)
         }
 
-        // ❤️ FAVORITO
+        // boton peli favorita
         IconButton(
             onClick = { userViewModel.toggleFavorite(movie.id) },
             modifier = Modifier
@@ -234,7 +229,7 @@ fun DetalleScreen(
                 tint = if (esFavorito) Color.Red else Color.White)
         }
 
-        // DIALOG RESEÑA
+        // dialog escribir reseña
         if (showDialog) {
             EscribirReseñaCard(
                 movieTitle = movie.title,
