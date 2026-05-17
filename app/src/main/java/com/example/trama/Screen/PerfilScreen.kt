@@ -38,9 +38,8 @@ fun PerfilScreen(
     userViewModel: UserViewModel = viewModel()
 ) {
     // Escucha cambios del ciclo de vida del usuario de forma reactiva
-// Guardamos el usuario actual de Firebase en una variable local para el efecto
     val firebaseUser = authViewModel.state.user
-// Cambia esto en tu PerfilScreen.kt
+
     LaunchedEffect(userId, readOnly, firebaseUser) {
         Log.d("DEBUG_TRAMA", "userId recibido: '$userId' | readOnly: $readOnly")
 
@@ -51,7 +50,7 @@ fun PerfilScreen(
                 userViewModel.checkFollowState(userId)
             }
         } else {
-            // Caso B: Mi propio perfil -> ¡AQUÍ PASAMOS EL PARAMÉTRO QUE FALTA!
+            // Caso B: Mi propio perfil
             if (firebaseUser != null) {
                 userViewModel.initUserSession(authenticatedUid = firebaseUser.uid)
             }
@@ -66,6 +65,15 @@ fun PerfilScreen(
     var avatarTemporalUrl by remember(perfil) { mutableStateOf(perfil?.profilePicture.orEmpty()) }
     var mostrarDialogoFotos by remember { mutableStateOf(false) }
     var pestañaActiva     by remember { mutableStateOf("RESEÑAS") }
+
+    // Estados para controlar los diálogos de seguidores y seguidos
+    var mostrarDialogoSeguidores by remember { mutableStateOf(false) }
+    var mostrarDialogoSeguidos   by remember { mutableStateOf(false) }
+
+    val listaUidsMostrar = remember(mostrarDialogoSeguidores, mostrarDialogoSeguidos, perfil) {
+        if (mostrarDialogoSeguidores) perfil?.followers?.keys?.toList().orEmpty()
+        else perfil?.following?.keys?.toList().orEmpty()
+    }
 
     val reviews   = if (readOnly) userViewModel.viewedUserReviews   else userViewModel.userReviews
     val favorites = if (readOnly) userViewModel.viewedUserFavorites  else userViewModel.favoritesDetails
@@ -149,13 +157,18 @@ fun PerfilScreen(
                 }
             }
 
-            // AVATAR + EMAIL + CONTADORES
+            // AVATAR + CONTADORES (Convertidos en botones interactivos)
             item {
                 Row(
                     modifier = Modifier.padding(horizontal = 24.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
+                    val profile = if (readOnly) userViewModel.viewedUserProfile else userViewModel.currentUserProfile
+
+                    val totalSeguidores = profile?.followers?.size ?: 0
+                    val totalSeguidos   = profile?.following?.size ?: 0
+
                     Box(
                         modifier = Modifier
                             .size(80.dp)
@@ -180,40 +193,39 @@ fun PerfilScreen(
                         }
                     }
 
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        if (!readOnly) {
-                            Text(
-                                text = authViewModel.state.user?.email ?: "",
-                                color = Color(0xFF8A8A8F), fontSize = 13.sp
-                            )
-                        }
-                        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                            val profile = if (readOnly) userViewModel.viewedUserProfile else userViewModel.currentUserProfile
+                    // BOTÓN SEGUIDORES
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable(enabled = totalSeguidores > 0) { mostrarDialogoSeguidores = true }
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = "$totalSeguidores",
+                            color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp
+                        )
+                        Text("seguidores", color = Color(0xFF8A8A8F), fontSize = 11.sp)
+                    }
 
-                            // Obtenemos el tamaño de forma segura comprobando si el mapa es nulo o está vacío
-                            val totalSeguidores = profile?.followers?.size ?: 0
-                            val totalSeguidos   = profile?.following?.size ?: 0
-
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    text = "$totalSeguidores",
-                                    color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp
-                                )
-                                Text("seguidores", color = Color(0xFF8A8A8F), fontSize = 11.sp)
-                            }
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    text = "$totalSeguidos",
-                                    color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp
-                                )
-                                Text("siguiendo", color = Color(0xFF8A8A8F), fontSize = 11.sp)
-                            }
-                        }
+                    // BOTÓN SEGUIDOS
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable(enabled = totalSeguidos > 0) { mostrarDialogoSeguidos = true }
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = "$totalSeguidos",
+                            color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp
+                        )
+                        Text("siguiendo", color = Color(0xFF8A8A8F), fontSize = 11.sp)
                     }
                 }
             }
 
-            // SOLICITUDES PENDIENTES — Corregido: Ya no aparece duplicado en el LazyColumn
+            // SOLICITUDES PENDIENTES
             item {
                 if (!readOnly) {
                     val pendientes = userViewModel.pendingRequestUids
@@ -290,7 +302,7 @@ fun PerfilScreen(
                 }
             }
 
-            // CERRAR SESIÓN — Corregido: Limpia de forma síncrona y desvincula listeners de la base de datos
+            // CERRAR SESIÓN
             item {
                 if (!editando && !readOnly) {
                     Text(
@@ -349,11 +361,83 @@ fun PerfilScreen(
         }
     }
 
+    // DIÁLOGO DE SELECCIÓN DE AVATAR
     if (mostrarDialogoFotos) {
         AvatarDialog(
             avatarActual  = avatarTemporalUrl,
             onSeleccionar = { url -> avatarTemporalUrl = url; mostrarDialogoFotos = false },
             onDismiss     = { mostrarDialogoFotos = false }
+        )
+    }
+
+    // DIÁLOGO FLOTANTE PARA SEGUIDORES Y SIGUIENDO
+    if (mostrarDialogoSeguidores || mostrarDialogoSeguidos) {
+        AlertDialog(
+            onDismissRequest = {
+                mostrarDialogoSeguidores = false
+                mostrarDialogoSeguidos = false
+            },
+            containerColor = Surface,
+            title = {
+                Text(
+                    text = if (mostrarDialogoSeguidores) "SEGUIDORES" else "SIGUIENDO",
+                    color = Accent,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Black
+                )
+            },
+            text = {
+                if (listaUidsMostrar.isEmpty()) {
+                    Text("No hay usuarios en esta lista.", color = Color.White)
+                } else {
+                    Box(modifier = Modifier.heightIn(max = 300.dp)) {
+                        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            items(listaUidsMostrar.size) { index ->
+                                val targetUid = listaUidsMostrar[index]
+                                var nombreUsuario by remember(targetUid) { mutableStateOf(targetUid.take(6)) }
+
+                                LaunchedEffect(targetUid) {
+                                    userViewModel.fetchUsernameForUid(targetUid) { nombreUsuario = it }
+                                }
+
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(BgDark)
+                                        .clickable {
+                                            mostrarDialogoSeguidores = false
+                                            mostrarDialogoSeguidos = false
+
+                                            // Carga asíncronamente el perfil del usuario pulsado
+                                            userViewModel.loadExternalUserData(targetUid)
+                                            userViewModel.checkFollowState(targetUid)
+                                        }
+                                        .padding(14.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "@$nombreUsuario",
+                                        color = Color.White,
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        mostrarDialogoSeguidores = false
+                        mostrarDialogoSeguidos = false
+                    }
+                ) {
+                    Text("Cerrar", color = Color.White, fontWeight = FontWeight.Bold)
+                }
+            }
         )
     }
 }
