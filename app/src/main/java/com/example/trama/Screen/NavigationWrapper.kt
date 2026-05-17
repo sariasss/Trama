@@ -56,6 +56,9 @@ private fun AppNavigation(
                         onNavigateToDetalle = { movie ->
                             movieViewModel.selectMovie(movie)
                             navController.navigate(AppDestinations.Detalle.createRoute(movie.title))
+                        },
+                        onNavigateToUserProfile = { userId ->
+                            navController.navigate(AppDestinations.PerfilUsuario.createRoute(userId))
                         }
                     )
                 }

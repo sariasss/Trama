@@ -1,6 +1,7 @@
 package com.example.trama.Screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -26,7 +27,8 @@ import com.example.trama.ViewModel.UserViewModel
 fun InicioScreen(
     movieViewModel: MovieViewModel,
     userViewModel: UserViewModel,
-    onNavigateToDetalle: (Movie) -> Unit
+    onNavigateToDetalle: (Movie) -> Unit,
+    onNavigateToUserProfile: (String) -> Unit
 ) {
     val state = movieViewModel.state
     val userState = userViewModel.state
@@ -99,7 +101,9 @@ fun InicioScreen(
                         items(userState.followingFeed.take(5)) { review ->
                             ReviewFeedCard(
                                 review = review,
-                                modifier = Modifier.padding(horizontal = 24.dp)
+                                modifier = Modifier
+                                    .padding(horizontal = 24.dp)
+                                    .clickable { onNavigateToUserProfile(review.userId) }
                             )
                         }
                     }
