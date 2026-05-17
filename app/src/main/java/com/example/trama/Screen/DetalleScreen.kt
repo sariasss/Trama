@@ -197,37 +197,37 @@ fun DetalleScreen(
             }
         }
 
-        IconButton(
-            onClick = onBack,
-            modifier = Modifier
-                .padding(start = 16.dp, top = 16.dp)
-                .background(Color(0x88121012), RoundedCornerShape(12.dp))
-        ) {
-            Icon(Icons.Default.ArrowBack, null, tint = Color.White)
-        }
-
-        // boton peli vista
-        IconButton(
-            onClick = { userViewModel.toggleWatchedMovie(movie.id) },
+        Row(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(16.dp)
-                .background(Color(0x88121012), RoundedCornerShape(12.dp))
+                .padding(top = 16.dp, end = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp) // <- Aquí controlas la separación entre los dos botones
         ) {
-            Icon(Icons.Default.Visibility, null,
-                tint = if (yaVista) Color(0xFF760B45) else Color.White)
-        }
+            // Boton peli favorita
+            IconButton(
+                onClick = { userViewModel.toggleFavorite(movie.id) },
+                modifier = Modifier
+                    .background(Color(0x88121012), RoundedCornerShape(12.dp))
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = null,
+                    tint = if (esFavorito) Color.Red else Color.White
+                )
+            }
 
-        // boton peli favorita
-        IconButton(
-            onClick = { userViewModel.toggleFavorite(movie.id) },
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(top = 16.dp, end = 64.dp)
-                .background(Color(0x88121012), RoundedCornerShape(12.dp))
-        ) {
-            Icon(Icons.Default.Favorite, null,
-                tint = if (esFavorito) Color.Red else Color.White)
+            // Boton peli vista
+            IconButton(
+                onClick = { userViewModel.toggleWatchedMovie(movie.id) },
+                modifier = Modifier
+                    .background(Color(0x88121012), RoundedCornerShape(12.dp))
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Visibility,
+                    contentDescription = null,
+                    tint = if (yaVista) Color(0xFF760B45) else Color.White
+                )
+            }
         }
 
         // dialog escribir reseña
