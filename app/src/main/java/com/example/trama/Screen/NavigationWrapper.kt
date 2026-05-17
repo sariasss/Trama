@@ -87,7 +87,10 @@ private fun AppNavigation(
                         readOnly = true,
                         authViewModel = authViewModel,
                         movieViewModel = movieViewModel,
-                        userViewModel = userViewModel
+                        userViewModel = userViewModel,
+                        onNavigateToUserProfile = { targetUid ->
+                            navController.navigate(AppDestinations.PerfilUsuario.createRoute(targetUid))
+                        }
                     )
                 }
 
@@ -95,7 +98,10 @@ private fun AppNavigation(
                     PerfilScreen(
                         authViewModel = authViewModel,
                         movieViewModel = movieViewModel,
-                        userViewModel = userViewModel
+                        userViewModel = userViewModel,
+                        onNavigateToUserProfile = { targetUid ->
+                            navController.navigate(AppDestinations.PerfilUsuario.createRoute(targetUid))
+                        }
                     )
                 }
 

@@ -34,22 +34,20 @@ private val BgDark  = Color(0xFF121012)
 private val Surface = Color(0xFF1C1A1C)
 private val Accent  = Color(0xFF760B45)
 
-//pantalla usuario, puede ver sus reseñas, favoritos y vistas, ve las notificaciones de seguimiento
-// podemos ver quien nos sigue y a quien seguimos
 @Composable
 fun PerfilScreen(
     userId: String? = null,
     readOnly: Boolean = false,
     authViewModel: AuthViewModel = viewModel(),
     movieViewModel: MovieViewModel = viewModel(),
-    userViewModel: UserViewModel = viewModel()
+    userViewModel: UserViewModel = viewModel(),
+    onNavigateToUserProfile: (String) -> Unit
 ) {
     val firebaseUser = authViewModel.state.user
 
     LaunchedEffect(userId, readOnly, firebaseUser) {
         Log.d("DEBUG_TRAMA", "userId recibido: '$userId' | readOnly: $readOnly")
 
-        //comprobar si es mi perfil o no
         if (readOnly) {
             if (userId != null) {
                 userViewModel.loadExternalUserData(userId)
@@ -121,6 +119,7 @@ fun PerfilScreen(
                     }
                 )
             }
+
             // avatar y seguidores/seguidos
             item {
                 Row(
@@ -282,7 +281,7 @@ fun PerfilScreen(
                 }
             }
 
-            // reseñas, fav y vista
+            // pestañas
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
@@ -310,7 +309,7 @@ fun PerfilScreen(
                 Box(Modifier.fillMaxWidth().padding(horizontal = 24.dp).height(1.dp).background(Surface))
             }
 
-            // pestaña activa reseñas, favoritos y vista
+            // contenido de pestañas
             when (pestañaActiva) {
                 "RESEÑAS" -> reseñasTab(
                     reviews  = reviews,
@@ -324,7 +323,6 @@ fun PerfilScreen(
         }
     }
 
-    // elegior avatar
     if (mostrarDialogoFotos) {
         AvatarDialog(
             avatarActual = avatarTemporalUrl,
@@ -333,7 +331,7 @@ fun PerfilScreen(
         )
     }
 
-    // dialog ver seguidores y seguidos
+    // dialog seguidores y seguidos
     if (mostrarDialogoSeguidores || mostrarDialogoSeguidos) {
         AlertDialog(
             onDismissRequest = {
@@ -372,8 +370,8 @@ fun PerfilScreen(
                                             mostrarDialogoSeguidores = false
                                             mostrarDialogoSeguidos = false
 
-                                            userViewModel.loadExternalUserData(targetUid)
-                                            userViewModel.checkFollowState(targetUid)
+                                            //para ir al usuario
+                                            onNavigateToUserProfile(targetUid)
                                         }
                                         .padding(14.dp),
                                     verticalAlignment = Alignment.CenterVertically
