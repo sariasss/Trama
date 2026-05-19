@@ -20,7 +20,8 @@ import com.example.trama.ViewModel.AuthViewModel
 @Composable
 fun AuthScreen(
     viewModel: AuthViewModel,
-    onAuthSuccess: () -> Unit = {}
+    onAuthSuccess: () -> Unit = {},
+    activityContext: android.content.Context?
 ) {
     val state = viewModel.state
     val context = LocalContext.current

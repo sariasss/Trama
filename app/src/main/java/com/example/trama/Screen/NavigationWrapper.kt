@@ -1,5 +1,6 @@
 package com.example.trama.Screen
 
+import android.app.Activity
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -11,6 +12,10 @@ import com.example.trama.Components.BottomBar
 import com.example.trama.ViewModel.AuthViewModel
 import com.example.trama.ViewModel.MovieViewModel
 import com.example.trama.ViewModel.UserViewModel
+import android.content.Context
+import android.content.ContextWrapper
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ComponentActivity
 
 @Composable
 fun NavigationWrapper(
@@ -22,7 +27,13 @@ fun NavigationWrapper(
     val authState = authViewModel.state
 
     if (!authState.isSuccess || authState.user == null) {
-        AuthScreen(viewModel = authViewModel, onAuthSuccess = {})
+        val context = LocalContext.current
+        val activityContext = context.findActivity()
+
+        AuthScreen(
+            viewModel = authViewModel,
+            activityContext = activityContext
+        )
         return
     }
 
@@ -129,4 +140,10 @@ private fun AppNavigation(
 
         BottomBar(navController)
     }
+}
+
+fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
 }

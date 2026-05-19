@@ -48,8 +48,11 @@ class MainActivity : ComponentActivity() {
                             movieViewModel = movieViewModel
                         )
                     } else {
+                        val activityContext = LocalContext.current
+
                         AuthScreen(
-                            viewModel = authViewModel
+                            viewModel = authViewModel,
+                            activityContext = activityContext
                         )
                     }
                 }
